@@ -13,7 +13,7 @@ import FirebaseAnalytics
 class TagmateAnalytics{
     
     static func configure(){
-        print("Firebase will initialize here...")
+        print("Firebase will initialize here....")
     }
     
     public static func logEvent(eventName: String, parameter: [String : Any]?){
