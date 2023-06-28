@@ -22,9 +22,9 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        getDevice()
-        getBundleId()
-        apiCallPost()
+//        getDevice()
+//        getBundleId()
+//        apiCallPost()
         
 //        FirebaseApp.configure()
         
@@ -33,12 +33,12 @@ class ViewController: UIViewController {
         
 //        TagmateAnalytics.configure()
         tagmateAnalytics = TagmateAnalytics()
-        tagmateAnalytics.logEvent(eventName: "jaidada", parameter: [
+        TagmateAnalytics.logEvent(eventName: "jaidada", parameter: [
             "abc":"abc_param",
             "key_2":"param_2"
         ])
         
-        tagmateAnalytics.setUserProperty(value: "realEstate", forName: "Property")
+        TagmateAnalytics.setUserProperty(value: "realEstate", forName: "Property")
         
         Analytics.logEvent("fjdsgfbjhsdb", parameters: [
             AnalyticsParameterQuantity: "3",
@@ -64,9 +64,14 @@ class ViewController: UIViewController {
     @objc func buttonTrapped(){
         view.backgroundColor = .systemCyan
         
-        tagmateAnalytics.logEvent(eventName: "jaidada", parameter: [
+        TagmateAnalytics.logEvent(eventName: "jaidada", parameter: [
             "abc":"abc_param",
             "key_2":"param_2"
+        ])
+        
+        TagmateAnalytics.logEvent(eventName: "BUTTON_CLICKED", parameter: [
+            "BUTTON_CLICKEDDD":"HEY"
+            
         ])
         
         getBundleId()
