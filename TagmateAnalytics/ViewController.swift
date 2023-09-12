@@ -33,8 +33,8 @@ class ViewController: UIViewController {
         
 //        TagmateAnalytics.configure()
         tagmateAnalytics = TagmateAnalytics()
-        TagmateAnalytics.logEvent(eventName: "jaidada", parameter: [
-            "abc":"abc_param",
+        TagmateAnalytics.logEvent(eventName: "home_screen_visible", parameter: [
+            "key_1":"abc_param",
             "key_2":"param_2"
         ])
         
@@ -113,7 +113,7 @@ class ViewController: UIViewController {
 //    "https://debugger-dev.tagmate.app/api/v1/debugger/appRequests/check/device"
     
     func apiCallPost(){
-        guard let url = URL(string: "http://192.168.2.155:3050/api/v1/debugger/appRequests/check/device") else {
+        guard let url = URL(string: "http://192.168.0.218:3050/api/v1/debugger/appRequests/check/device") else {
             return
         }
         

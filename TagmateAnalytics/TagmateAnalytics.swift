@@ -2,8 +2,7 @@
 //  TagmateAnalytics.swift
 //  TagmateAnalytics
 //
-//  Created by Kuldeep on 26/06/23.
-//
+//  Created by Kuldeep Rathod on 26/06/23.
 
 import Foundation
 import UIKit
@@ -16,9 +15,9 @@ class TagmateAnalytics{
     var optionalValue: String!
     var bundleId: String!
     var appInstanceID: String!
-    var currentSessionID: String?
+    var currentSessionID: Any!
+//    let sessionIdCurrent : Any?
 
-    
     static func configure(){
         print("Firebase will initialize here....")
         FirebaseApp.configure()
@@ -26,13 +25,13 @@ class TagmateAnalytics{
         var tagmateAnaltics = TagmateAnalytics()
         tagmateAnaltics.getBundleId()
         tagmateAnaltics.apiCheckDevice()
-
     }
     
     public static func logEvent(eventName: String, parameter: [String : Any]?){
         Analytics.logEvent(eventName, parameters: parameter)
         
         let tagmateAnaltics = TagmateAnalytics()
+//        print("MY SESSION ID in logevent", self.currentSessionID)
         
         //need to add condition for the sessionId is null or not
         tagmateAnaltics.sendLogEvent(eventName: eventName, parameter: parameter)
@@ -80,7 +79,8 @@ class TagmateAnalytics{
 //    "https://debugger-dev.tagmate.app/api/v1/debugger/appRequests/check/device"
     
     private func apiCheckDevice(){
-        guard let url = URL(string: "http://192.168.2.155:3050/api/v1/debugger/appRequests/check/device") else {
+        guard let url = URL(string: "http://192.168.2.156:3050/api/v1/debugger/appRequests/check/device") else {
+            print("URL not getting")
             return
         }
         
@@ -122,16 +122,13 @@ class TagmateAnalytics{
                   return
                 }
             
-//            print("RESPONSE_CODE ",httpResponse.statusCode)
-
-            
             guard let data = data, error == nil else{
                 return
             }
             
             do{
                 let response = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                print("SUCCESS: \(response)")
+                print("SUCCESSSSSSSSSSSSSSSSSS: \(response)")
                 
 //                currentSessionID =
                 
@@ -143,22 +140,33 @@ class TagmateAnalytics{
                            if let data = jsonObject["data"] as? [String: Any] {
                                // Check if the "sessionId" key exists
                                
+                               print("DatA get", data["sessionId"])
                              
-                               if let sessionId2 = data["sessionId"] as? String {
-                                   print("Session ID: ", sessionId2)
-                                   self.currentSessionID = sessionId2
-                                   print("Current Session ID: ", self.currentSessionID)
-                               } else {
-                                   print("Session ID not found or value is not a string")
+//                               if let sessionId2 = data["sessionId"] as? String {
+//                                   print("Session ID: ", sessionId2)
+//                                   self.currentSessionID = sessionId2
+//                                   print("Current Session ID: ", self.currentSessionID)
+//                               } else {
+//                                   print("Session ID not found or value is not a string")
+//                               }
+                               
+                               
+                               if data["sessionId"] != nil {
+                                   print("OUR SESSION::: ", data["sessionId"])
+                                   self.currentSessionID = data["sessionId"]
+                                   print("MY SESSION ID", self.currentSessionID)
+                               } else{
+                                   self.currentSessionID = "";
+                                   print("Session ID not found!")
                                }
                               
 
                                
-                               if let sessionId = data["sessionId"] as? String {
-                                   print("sessionId: \(sessionId)")
-                               } else {
-                                   print("sessionId not found or value is not a string")
-                               }
+//                               if let sessionId = data["sessionId"] as? String {
+//                                   print("sessionId: \(sessionId)")
+//                               } else {
+//                                   print("sessionId not found or value is not a string")
+//                               }
                            } else {
                                print("Key 'data' not found or value is not a dictionary")
                            }
@@ -199,7 +207,8 @@ class TagmateAnalytics{
     
     
     func sendLogEvent(eventName: String, parameter: [String : Any]?) {
-        guard let url = URL(string: "http://192.168.2.155:3050/api/v1/debugger/appRequests") else {
+        print("sessionID::::::", self.currentSessionID)
+        guard let url = URL(string: "http://192.168.2.156:3050/api/v1/debugger/appRequests") else {
             print("Invalid URL")
             return
         }
@@ -208,21 +217,9 @@ class TagmateAnalytics{
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-//        let payload: [String: Any] = [
-//            "event_name": eventName,
-//            "params": [
-//                "KEY_1": "VIEW_ITEM_1"
-//            ],
-//            "meta": [
-//                "app_instance_id": "c9b762b8c5b109485d2f076b15ac33c0",
-//                "app_package_name": "com.dada.firebasebutton2",
-//                "sessionId": "",
-//                "deviceId": "c751bcc82ea9efe2"
-//            ]
-//        ]
-//
-        
         getBundleId()
+        
+        print("MY SESSION ID in appReq", self.currentSessionID)
         
         let payload: [String: Any] = [
             "event_name": eventName,
@@ -230,7 +227,7 @@ class TagmateAnalytics{
             "meta": [
                 "app_instance_id": Analytics.appInstanceID(),
                 "app_package_name": bundleId,
-                "sessionId": "",
+                "sessionId": currentSessionID,
                 "deviceId": UIDevice.current.identifierForVendor!.uuidString
             ]
         ]
@@ -240,6 +237,7 @@ class TagmateAnalytics{
         
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: payload, options: [])
+            print("jsonData", payload)
             request.httpBody = jsonData
         } catch {
             print("Error creating JSON data: \(error)")
