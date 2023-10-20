@@ -25,7 +25,17 @@ class TagmateAnalytics{
         
         var tagmateAnaltics = TagmateAnalytics()
         tagmateAnaltics.getBundleId()
-                tagmateAnaltics.apiCheckDevice()
+        tagmateAnaltics.apiCheckDevice{ sessionID in
+            if let sessionID = sessionID {
+                print("Session ID is available::::", sessionID)
+
+            }
+            else {
+                        // Handle the case where the session ID is not available
+                        print("Session ID not available")
+                    }
+            
+        }
     }
     
     func getBundleId(){
@@ -37,7 +47,7 @@ class TagmateAnalytics{
         }
     }
     
-    private func apiCheckDevice(){
+    private func apiCheckDevice(completion: @escaping (Any?) -> Void){
         guard let url = URL(string: apiUrl) else {
             print("URL not getting")
             return
@@ -101,12 +111,20 @@ class TagmateAnalytics{
                                           print("OUR SESSION::: ", data["sessionId"])
                                           self.currentSessionID = data["sessionId"]
                                           print("MY SESSION ID", self.currentSessionID)
+                                          
+                                          if let sessionID = self.currentSessionID {
+                                                       completion(sessionID) // Pass the session ID to the completion handler
+                                                   } else {
+                                                       completion(nil) // If session ID is not found
+                                                   }
                                       } else{
                                           self.currentSessionID = "";
                                           print("Session ID not found!")
+                                          completion(nil)
                                       }
                                   } else {
                                       print("Key 'data' not found or value is not a dictionary")
+                                      completion(nil)
                                   }
                               } else {
                                   print("Invalid JSON format")
@@ -116,6 +134,7 @@ class TagmateAnalytics{
                    catch{
                        print(error.localizedDescription)
                        print(error)
+                       completion(nil)
                    }
                }
                task.resume()
@@ -170,7 +189,7 @@ class TagmateAnalytics{
                   return
               }
               
-              print("Response code: \(httpResponse.statusCode)")
+              print("Response code of send logevent: \(httpResponse.statusCode)")
               
               if let data = data {
                   // Handle the response data here
@@ -212,7 +231,20 @@ class TagmateAnalytics{
         
         let tagmateAnaltics = TagmateAnalytics()
         
-        tagmateAnaltics.sendLogEvent(eventName: eventName, parameter: parameter)
+//        tagmateAnaltics.sendLogEvent(eventName: eventName, parameter: parameter)
+        tagmateAnaltics.getBundleId()
+        tagmateAnaltics.apiCheckDevice { sessionID in
+                if let sessionID = sessionID {
+                    // You have the session ID, you can use it here
+                    print("Session ID is available in send logEvent:", sessionID)
+                    
+                    // Now, you can call sendLogEvent or perform other actions that require the session ID
+                    tagmateAnaltics.sendLogEvent(eventName: eventName, parameter: parameter)
+                } else {
+                    // Handle the case where the session ID is not available
+                    print("Session ID not available:::::::::::::::::")
+                }
+            }
         
     }
     
